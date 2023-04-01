@@ -1,0 +1,20 @@
+Introduction
+Node.js is a powerful and versatile tool for developers, allowing them to use JavaScript to create high-performance web servers without the burden of managing thread concurrency. Its use of asynchronous I/O and non-blocking paradigms makes it a great choice for handling thousands of concurrent connections with a single server. Additionally, developers can use the latest ECMAScript standards without worrying about browser compatibility. With Node.js, frontend developers can easily transition to server-side development without having to learn a new language.
+
+Difference between node and browser
+Node.js and browser-based JavaScript may use the same language, but they are different in many ways. The advantage of using Node.js for frontend developers is the ability to program both the frontend and backend in a single language. However, the lack of access to the DOM and other Web Platform APIs in Node.js can be a challenge. On the other hand, Node.js offers useful APIs like filesystem access, and developers have control over the environment. They can write modern ES2015+ JavaScript without worrying about browser compatibility, and Node.js supports both CommonJS and ES module systems. In contrast, the browser only supports the ES Modules standard.
+
+V8 Javascript Engine
+V8 is a powerful and versatile JavaScript engine that has enabled JavaScript to be used in a variety of different contexts beyond just web browsers, including on servers and desktop applications. Its ability to compile JavaScript code and optimize performance has made it a popular choice for developers looking to build high-performance applications with JavaScript.
+
+Compilation
+ The idea of compiling JavaScript instead of purely interpreting it has become more common as the complexity and size of JavaScript applications have grown. The just-in-time (JIT) compilation used by V8 allows it to compile JavaScript code on-the-fly as it runs, which can result in faster execution times than pure interpretation. This approach can also allow for optimizations like inline caching and function inlining, which can further improve performance.
+
+ES6
+ Node.js keeps up-to-date with the latest releases of V8 to bring new features from the JavaScript ECMA-262 specification to Node.js developers in a timely manner, as well as to ensure continued performance and stability improvements.
+
+ Typescript
+ TypeScript is a popular open-source language created by Microsoft, offering exciting new possibilities to software developers. By providing static type definitions, TypeScript enables precise function and object creation and prevents bugs before they can cause issues. Plus, it integrates seamlessly with popular code editors like Visual Studio Code, making it a powerful and effective tool for creating secure and robust JavaScript projects.
+
+ Wasm 
+ WebAssembly is a high-performance language that can be compiled from various languages and supported by major browsers. It has two file formats, binary and text, and key concepts such as module, memory, table, and instance. To use WebAssembly, you need a binary file and APIs, which Node.js provides through the global WebAssembly object.
