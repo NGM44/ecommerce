@@ -8,12 +8,13 @@ const {
   deleteUser,
   updateUser,
 } = require("../controller/userCtrl");
+const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 
 router.post("/register", createUser);
 router.post("/login", loginUserCtrl);
 router.get("/getAllUser", getAllUser);
-router.get("/:id", getUser);
+router.get("/:id", authMiddleware, isAdmin, getUser);
 router.delete("/:id", deleteUser);
-router.put("/:id", updateUser);
+router.put("/:id", authMiddleware, isAdmin, updateUser);
 
 module.exports = router;
