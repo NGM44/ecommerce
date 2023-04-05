@@ -4,6 +4,7 @@ const asyncHandler = require("express-async-handler");
 
 const authMiddleware = asyncHandler(async (req, res, next) => {
   let token;
+
   if (req?.headers?.authorization?.startsWith("Bearer")) {
     token = req.headers.authorization.split(" ")[1];
     try {
@@ -21,7 +22,7 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
   }
 });
 
-const isAdmin = asyncHandler(async (res, req, next) => {
+const isAdmin = asyncHandler(async (req, res , next) => {
   const { email } = req.user;
   const adminUser = await User.findOne({ email });
   if (adminUser.role !== "admin") {

@@ -1,6 +1,10 @@
 const { generateToken } = require("../config/jwtToken");
 const User = require("../models/userModel");
 const asyncHandler = require("express-async-handler");
+const validateMongoDbId = require("../utils/validateMongodbid");
+const { generateRefreshToken } = require("../config/refreshToken");
+const jwt = require("jsonwebtoken");
+
 const createUser = asyncHandler(async (req, res) => {
   const mail = req.body.email;
 
@@ -16,9 +20,18 @@ const createUser = asyncHandler(async (req, res) => {
 
 const loginUserCtrl = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  console.log(email, password);
   const isUserExist = await User.findOne({ email });
   if (isUserExist && (await isUserExist.isPasswordMatched(password))) {
+    const refreshToken = await generateRefreshToken(isUserExist?._id);
+    const updateUser = await User.findByIdAndUpdate(isUserExist._id,{
+      refreshToken:refreshToken,
+    },
+    { new: true }
+    );
+    res.cookie("refreshToken",refreshToken,{
+      httpOnly:true,
+      maxAge: 72* 24* 60*60*1000,
+    });
     res.json({
       _id: isUserExist?._id,
       firstname: isUserExist?.firstname,
@@ -26,11 +39,52 @@ const loginUserCtrl = asyncHandler(async (req, res) => {
       email: isUserExist.email,
       mobile: isUserExist.mobile,
       token: generateToken(isUserExist?._id),
+      
     });
   } else {
     throw new Error("Invalid Credentials");
   }
 });
+
+const handleRefreshToken = asyncHandler(async(req,res)=>{
+  const cookie = req.cookies;
+  if(!cookie) throw new Error("No Refresh Token in Cookies");
+  const refreshToken = cookie.refreshToken;
+ const user = await User.findOne({refreshToken});
+ if(!user) throw new Error("no refresh token present in db");
+ jwt.verify(refreshToken, process.env.JWT_SECRET,(err,decoded) =>{
+ if(err || user.id !== decoded.id)
+  throw new Error("Something Wrong with Refresh Token");
+ 
+const accessToken = generateToken(user?._id);
+res.json({accessToken})
+ })
+
+});
+
+
+const logout = asyncHandler(async(req,res)=>{
+
+  const cookie = req.cookies;
+  if(!cookie) throw new Error("No Refresh Token in Cookies");
+  const refreshToken = cookie.refreshToken;
+  const user= await User.findOne({refreshToken});
+  if(!user){
+    res.clearCookie("refreshToken",{
+      httpOnly:true,
+      secure:true,
+    });
+    return res.status(204);
+  }
+  await User.findOneAndUpdate(refreshToken,{
+    refreshToken:"",
+  },{new:true});
+ res.clearCookie("refreshToken",{
+      httpOnly:true,
+      secure:true,
+    });
+      return res.sendStatus(204);
+})
 
 const getAllUser = asyncHandler(async (req, res) => {
   try {
@@ -43,7 +97,7 @@ const getAllUser = asyncHandler(async (req, res) => {
 
 const getUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+ validateMongoDbId(id);
   try {
     const getUser = await User.findById(id);
     res.json(getUser);
@@ -54,7 +108,7 @@ const getUser = asyncHandler(async (req, res) => {
 
 const deleteUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+ validateMongoDbId(id);
   try {
     const deleteUser = await User.findByIdAndDelete(id);
     res.json(deleteUser);
@@ -64,11 +118,11 @@ const deleteUser = asyncHandler(async (req, res) => {
 });
 
 const updateUser = asyncHandler(async (req, res) => {
-  console.log(req.user);
-  const { id } = req.params;
+  const { _id } = req.user;
+  validateMongoDbId(_id);
   try {
     const updatedUser = await User.findByIdAndUpdate(
-      id,
+      _id,
       {
         firstname: req?.body.firstname,
         lastname: req?.body.lastname,
@@ -85,6 +139,43 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 });
 
+const  blockUser = asyncHandler(async(req,res)=>{
+  const { id } = req.params;
+ validateMongoDbId(id);
+  try {
+    const block = await User.findByIdAndUpdate(id,{
+      isBlocked:true,
+    },{
+      new:true,
+    }
+    );
+    res.json({
+      message:"user blocked"
+    })
+  
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+const unblockUser = asyncHandler(async(req,res)=>{
+   const {id} = req.params;
+ validateMongoDbId(id);
+  try {
+    const block = await User.findByIdAndUpdate(id,{
+      isBlocked:false,
+    },{
+      new:true,
+    }
+    );
+     res.json({
+      message:"user unblocked"
+    })
+  
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 module.exports = {
   createUser,
   loginUserCtrl,
@@ -92,4 +183,8 @@ module.exports = {
   getUser,
   deleteUser,
   updateUser,
+  blockUser,
+  unblockUser,
+  handleRefreshToken,
+  logout
 };

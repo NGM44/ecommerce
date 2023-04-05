@@ -26,6 +26,10 @@ var userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    isBlocked:{
+      type:Boolean,
+      default:false,
+    },
     role: {
       type: String,
       default: "user",
@@ -34,6 +38,9 @@ var userSchema = new mongoose.Schema(
       type: Array,
       default: [],
     }, 
+    refreshToken:{
+      type: String,
+    },
     address: [{ type: mongoose.Schema.Types.ObjectId, ref: "Address" }],
     wishList: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
   },
