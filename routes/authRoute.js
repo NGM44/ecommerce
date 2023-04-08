@@ -17,7 +17,15 @@ const {
   resetPassword,
   saveAddress,
   addWishList,
-  getWishList
+  getWishList,
+  userCart,
+  getUserCart,
+  emptyUserCart,
+  applyCoupon,
+  createOrder,
+  getOrders,
+  getAllOrders,
+  updateOrderStatus
 } = require("../controller/userCtrl");
 const { authMiddleware, isAdmin } = require("../middlewares/authMiddleware");
 
@@ -27,6 +35,18 @@ router.get("/refresh",handleRefreshToken);
 router.get("/logout",logout);
 router.post("/register", createUser);
 router.post("/login", loginUserCtrl);
+router.post("/cart",authMiddleware, userCart);
+router.get("/cart",authMiddleware, getUserCart);
+router.delete("/cart",authMiddleware, emptyUserCart);
+
+router.post("/cart/applyCoupon",authMiddleware, applyCoupon);
+router.post("/cart/order",authMiddleware, createOrder);
+router.get("/cart/order",authMiddleware, getOrders);
+router.get("/cart/order/all",authMiddleware, getAllOrders);
+router.put("/cart/order/:id",authMiddleware,isAdmin, updateOrderStatus);
+
+
+
 router.post("/admin-login",loginAdmin)
 router.put('/password',authMiddleware,updatePassword)
 router.post('/forgot-password-token',authMiddleware,forgotPasswordToken)
