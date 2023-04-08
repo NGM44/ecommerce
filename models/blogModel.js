@@ -39,9 +39,8 @@ var blogSchema = new mongoose.Schema({
         ref:"User",   
         }
     ],
-    image:{
-        type:String,
-        default:""
+   images: {
+      type: Array,
     },
     author:{
         type:String,

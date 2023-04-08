@@ -185,7 +185,6 @@ const updatePassword = asyncHandler(async(req,res)=>{
 
 
   const user = await User.findById(_id);
-  console.log(user); 
   if(password)
   {
     user.password = password;
@@ -222,8 +221,7 @@ const forgotPasswordToken = asyncHandler(async(req,res)=>{
 const resetPassword = asyncHandler((async(req,res)=>{
   const {password} = req.body;
   const {token} = req.params;
- console.log("password",password);
-  console.log("token",token);
+
   const hashedToken = crypto.createHash('sha256').update(token).digest("hex");
 
   const user = await User.findOne({
